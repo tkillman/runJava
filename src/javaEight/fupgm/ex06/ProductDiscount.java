@@ -1,9 +1,6 @@
 package javaEight.fupgm.ex06;
 
-import lombok.Data;
-import lombok.ToString;
 
-@Data
 public class ProductDiscount extends Product{
 	
 	public ProductDiscount() {

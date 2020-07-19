@@ -19,7 +19,7 @@ class EqualsEx2 {
 		}
 	}
 
-class Person{
+static class Person{
 	long id;
 	
 	public boolean equals(Object obj){

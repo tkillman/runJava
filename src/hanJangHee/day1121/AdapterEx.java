@@ -40,13 +40,19 @@ class AdapterEx extends Frame implements ActionListener{
 		b1.addActionListener(this);
 		b2.addActionListener(this);
 		
-		tf.addKeyListener(new KeyEventHandler(tf, ta));
+//		tf.addKeyListener(new KeyEventHandler(tf, ta));
 		
-		addWindowListener(new WindowAdapter()){
-			public void windowClosing(WindowEvent e){
-				System.exit(0);
-			}
-		}
+//		addWindowListener(new WindowAdapter()){
+//			public void windowClosing(WindowEvent e){
+//				System.exit(0);
+//			}
+//		}
+		
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
 		
 	}
 

@@ -1,10 +1,21 @@
 package hanJangHee.day1121;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.datatransfer.*;
-import java.awt.event.*;
-import java.awt.datatransfer.*;
+import java.awt.Button;
+import java.awt.Dialog;
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.Menu;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.TextArea;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 class Memo extends Frame implements ActionListener{
 	
@@ -97,9 +108,9 @@ class Memo extends Frame implements ActionListener{
 		 addWindowListener(new WindowAdapter() {
 			 public void windowClosing(WindowEvent e){
 				 if(bModify){
-					 savefile();
+					 //savefile();
 				 }
-				 System.exit(0);;
+				 System.exit(0);
 			 }
 		 });
 		 
@@ -129,9 +140,9 @@ class Memo extends Frame implements ActionListener{
 		 
 		 if(name.equals("새파일")){
 			 if(bModify){
-				 MessageBox();
+				 //MessageBox();
 				 if(bSaveas){
-					 saveFile();
+					 //saveFile();
 				 }
 			 }
 			 ta.setText("");
@@ -142,13 +153,13 @@ class Memo extends Frame implements ActionListener{
 			 ta.requestFocus();
 		 }else if(name.equals("저장")){
 			 bSaveas = true;
-			 saveFile();
+			 //saveFile();
 			 ta.requestFocus();	 
 		 }else if(name.equals("종료")){
 			 if(bModify){
-				 MessageBox();
+				 //MessageBox();
 				 if(bSaveas){
-					 saveFile();
+					 //saveFile();
 				 }
 			 }
 			 System.exit(0);

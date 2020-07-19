@@ -1,4 +1,4 @@
-package thisisjava_18;
+package runJava.ch20.thisisjava_18;
 
 import java.io.IOException;
 import java.io.InputStream;

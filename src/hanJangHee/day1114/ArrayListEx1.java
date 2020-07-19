@@ -35,13 +35,11 @@ class ArrayListEx1 {
 		System.out.println("list1.retainAll(list2) :" + list1.retainAll(list2));
 		
 		print(list1, list2);
-		
-		
-		
-		
-		
+
 	}
 	
-	
+	public static void print(ArrayList list1, ArrayList list2) {
+		
+	}
 
 }

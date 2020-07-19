@@ -10,7 +10,7 @@ class VectorEx2 {
 		v.add(100.3);
 		v.add(3.14);
 		v.addElement(1000.);
-		for(Double n : v);
+		for(Double n : v)
 		  System.out.println(n);
 		
 		double search = 1000.0;

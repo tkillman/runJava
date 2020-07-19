@@ -1,7 +1,9 @@
 package hanJangHee.day1123;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 class MultiServerThread implements Runnable{
 	private Socket socket;
@@ -41,12 +43,12 @@ class MultiServerThread implements Runnable{
 	}
 	
 	public void broadCasting(String message) throws IOException{
-		for(MultiSeverThread ct : ms.getList()){
-			ct.send(message);
-		}
+//		for(MultiSeverThread ct : ms.getList()){
+//			ct.send(message);
+//		}
 	}
 	
 	public void send(String message) throws IOException{
-		oos.writeObjcet(message);
+//		oos.writeObjcet(message);
 	}
 }

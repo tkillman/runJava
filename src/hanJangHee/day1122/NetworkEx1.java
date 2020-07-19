@@ -27,9 +27,13 @@ class NetworkEx1 {
 		}catch(UnknownHostException e){
 			e.printStackTrace();
 		}
+		
 		try{
 			ip = InetAddress.getLocalHost();
 			System.out.println("getHostName() :" );
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
 		}
 	}
 

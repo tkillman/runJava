@@ -1,5 +1,7 @@
 package hanJangHee.day1103;
 
+import hanJangHee.day1103.Deck.Card;
+
 class DeckTest {
   public static void main(String[] args){
 	  
