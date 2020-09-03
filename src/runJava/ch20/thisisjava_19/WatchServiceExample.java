@@ -1,5 +1,6 @@
 package runJava.ch20.thisisjava_19;
 
+import java.awt.TextArea;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,113 +11,108 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
 
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
-
 //**************** WathchServiceExample*****************
-// WatchService ÀÎÅÍÆäÀÌ½º´Â newWatchService()¸Þ¼Òµå¸¦ ÅëÇØ ±¸Çö°´Ã¼¸¦ ¾òÀ» ¼ö ÀÖ´Ù.
+// WatchService ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ newWatchService()ï¿½Þ¼Òµå¸¦ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö´ï¿½.
 
 
-
-
-public class WatchServiceExample extends Application {
-
-	class WatchServiceThread extends Thread {
-		@Override
-		public void run() {
-
-			try {
-
-				WatchService watchService = FileSystems.getDefault().newWatchService();
-				Path directory = Paths.get("C:/Temp");
-				directory.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
-						StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
-
-				while (true) {
-					WatchKey watchKey = watchService.take(); //ºí·ÎÅ· ¸Þ¼Òµå
-					List<WatchEvent<?>> list = watchKey.pollEvents();
-
-					for (WatchEvent watchEvent : list) {
-
-						// ÀÌº¥Æ® Á¾·ù ¾ò±â
-						Kind kind = watchEvent.kind();
-
-						// °¨ÁöµÈ Path ¾ò±â
-						Path path = (Path) watchEvent.context();
-
-						if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-
-							Platform.runLater(() ->
-
-							textArea.appendText("ÆÄÀÏ »ý¼º µÊ -> " + path.getFileName() + "\n")
-
-							);
-
-						} else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-
-							Platform.runLater(() ->
-
-							textArea.appendText("ÆÄÀÏ »èÁ¦ µÊ -> " + path.getFileName() + "\n")
-
-							);
-
-						} else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-
-							Platform.runLater(() ->
-
-							textArea.appendText("ÆÄÀÏ ¼öÁ¤µÊ -> " + path.getFileName() + "\n")
-
-							);
-
-						} else if (kind == StandardWatchEventKinds.OVERFLOW) {
-						}
-
-					} // for each¹® Á¾·á
-
-					boolean valid = watchKey.reset();
-					if (!valid) {
-						break;
-					}
-
-				} // ¹«ÇÑ ·çÇÁ
-
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-
-		}
-	}
-
-	TextArea textArea;
-
-	@Override
-	public void start(Stage primaryStage) throws Exception {
-		// TODO Auto-generated method stub
-		BorderPane root = new BorderPane();
-		root.setPrefSize(500, 300);
-
-		textArea = new TextArea();
-		textArea.setEditable(false);
-		root.setCenter(textArea);
-
-		Scene scene = new Scene(root);
-		primaryStage.setScene(scene);
-		primaryStage.setTitle("WatchServiceExample");
-		primaryStage.show();
-		
-		WatchServiceThread wst = new WatchServiceThread();
-		wst.start();
-
-	} // start ¸Þ¼Òµå Á¾·á
-
-	public static void main(String[] args) {
-
-		launch(args);
-
-	} // ¸ÞÀÎ ¸Þ¼Òµå Á¾·á
-
+public class WatchServiceExample {
+	
 }
+
+//public class WatchServiceExample extends Application {
+//
+//	class WatchServiceThread extends Thread {
+//		@Override
+//		public void run() {
+//
+//			try {
+//
+//				WatchService watchService = FileSystems.getDefault().newWatchService();
+//				Path directory = Paths.get("C:/Temp");
+//				directory.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
+//						StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+//
+//				while (true) {
+//					WatchKey watchKey = watchService.take(); //ï¿½ï¿½ï¿½Å· ï¿½Þ¼Òµï¿½
+//					List<WatchEvent<?>> list = watchKey.pollEvents();
+//
+//					for (WatchEvent watchEvent : list) {
+//
+//						// ï¿½Ìºï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+//						Kind kind = watchEvent.kind();
+//
+//						// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Path ï¿½ï¿½ï¿½
+//						Path path = (Path) watchEvent.context();
+//
+//						if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+//
+//							Platform.runLater(() ->
+//
+//							textArea.appendText("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ -> " + path.getFileName() + "\n")
+//
+//							);
+//
+//						} else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+//
+//							Platform.runLater(() ->
+//
+//							textArea.appendText("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ -> " + path.getFileName() + "\n")
+//
+//							);
+//
+//						} else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+//
+//							Platform.runLater(() ->
+//
+//							textArea.appendText("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ -> " + path.getFileName() + "\n")
+//
+//							);
+//
+//						} else if (kind == StandardWatchEventKinds.OVERFLOW) {
+//						}
+//
+//					} // for eachï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+//
+//					boolean valid = watchKey.reset();
+//					if (!valid) {
+//						break;
+//					}
+//
+//				} // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+//
+//			} catch (Exception e) {
+//				// TODO: handle exception
+//			}
+//
+//		}
+//	}
+//
+//	TextArea textArea;
+//
+//	@Override
+//	public void start(Stage primaryStage) throws Exception {
+//		// TODO Auto-generated method stub
+//		BorderPane root = new BorderPane();
+//		root.setPrefSize(500, 300);
+//
+//		textArea = new TextArea();
+//		textArea.setEditable(false);
+//		root.setCenter(textArea);
+//
+//		Scene scene = new Scene(root);
+//		primaryStage.setScene(scene);
+//		primaryStage.setTitle("WatchServiceExample");
+//		primaryStage.show();
+//		
+//		WatchServiceThread wst = new WatchServiceThread();
+//		wst.start();
+//
+//	} // start ï¿½Þ¼Òµï¿½ ï¿½ï¿½ï¿½ï¿½
+//
+//	public static void main(String[] args) {
+//
+//		launch(args);
+//
+//	} // ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼Òµï¿½ ï¿½ï¿½ï¿½ï¿½
+
+//}
