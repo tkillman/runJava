@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 
 public class Ex01 {
 	public static void main(String[] args) {
-		//諛곗뿴 �뒪�듃由�
+		//stream
 		String[] arr = new String[] {"a","b","c"};
 		
 		Stream<String> stream = Arrays.stream(arr);

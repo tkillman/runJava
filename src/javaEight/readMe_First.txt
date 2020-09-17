@@ -29,9 +29,10 @@ ex06 map 메소드
 ex07 stream
 	==> stream의 장점
 	==> stream을 다시 list나 set으로 반환받는 메소드
-	==> stream을 join해서 string으로 반환하는 메소드
-	
-	
+	==> stream을 join해서 string으로 반환하는 메소드	
+
+ex09 optional
+	===> null 처리	
 ====================================================
 
 #blog
@@ -72,7 +73,7 @@ ex05 Stream.iterate()
 ex06 기본 타입형 스트림 /String/ fileStream
 ex07 filter
 ex08 function
-ex09 groupby
+ex09 optional, groupby
 ex10 collect
 ex11 reduce
 ====================================================
