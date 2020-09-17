@@ -70,7 +70,14 @@ ex03 Stream.builder()
 ex04 Stream.generate()
 ex05 Stream.iterate()
 ex06 기본 타입형 스트림 /String/ fileStream
-ex07 
-
+ex07 filter
+ex08 function
+ex09 groupby
+ex10 collect
+ex11 reduce
+====================================================
+package practice
+	
+ch01. 평균 구하기, 최저점 구하기
 
 	

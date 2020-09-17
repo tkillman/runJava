@@ -1,278 +1,258 @@
 package runJava.ch20.thisisjava_18;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Iterator;
-import java.util.Vector;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
-
-public class ServerExample extends Application {
-	
-	
-	ExecutorService executorService;
-	ServerSocket serverSocket;
-	Vector<Client> connections = new Vector<>();
-	int portNumber =5001;
-	String hostIp = "192.168.20.26";
-
-	
-	public class Client { //³»ºÎ Å¬·¡½º
-		
-		Socket socket;
-
-		
-		public Client(Socket socket) {
-			this.socket = socket;
-			receive();
-		}
-
-		
-		void receive() {
-			
-			Runnable runnable = new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						while (true) {
-							
-							byte[] byteArr = new byte[100];
-							InputStream inputStream = socket.getInputStream();
-							int readByteCount = inputStream.read(byteArr);//Å¬¶óÀÌ¾ðÆ®µé¿¡°Ô ¿À´Â ¸Þ¼¼Áö È®ÀÎ
-							
-							if (readByteCount == -1) {
-								throw new IOException();
-							}
-							
-							String message = "¿äÃ» Ã³¸®" + socket.getRemoteSocketAddress() +Thread.currentThread().getName();
-							Platform.runLater(() -> {
-								displayText(message);
-							});
-
-							String data = new String(byteArr, 0, readByteCount, "UTF-8");
-
-							for (Client client : connections) { //Å¬¶óÀÌ¾ðÆ®µé¿¡°Ô ¸ðµÎ ¸Þ¼¼Áö º¸³¿
-								client.send(data);
-							}
-
-						} // ¹«ÇÑ ·çÇÁ
-
-					} catch (IOException e) {
-
-						try {
-							connections.remove(Client.this);
-							String message = "Å¬¶óÀÌ¾ðÆ® Åë½Å ¾ÈµÊ" + socket.getRemoteSocketAddress();
-							Platform.runLater(() -> {
-								displayText(message);
-							});
-
-							socket.close();
-
-						} catch (Exception e2) {
-							// TODO: handle exception
-						}
-
-					}
-
-				}
-			};
-
-			executorService.submit(runnable);  // 1
-		}
-
-		void send(String data) {
-			Runnable runnable = new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-
-						byte[] byteArr = data.getBytes("UTF-8");
-						OutputStream outputStream = socket.getOutputStream();
-						outputStream.write(byteArr); 
-						outputStream.flush();
-
-					} catch (Exception e) {
-						try {
-							String message = "Å¬¶óÀÌ¾ðÆ® Åë½Å ¾ÈµÊ :" + socket.getRemoteSocketAddress();
-							Platform.runLater(() -> {
-								displayText(message);
-							});
-
-							connections.remove(Client.this);
-							socket.close();
-
-						} catch (Exception e2) {
-							// TODO: handle exception
-						}
-
-					}
-				} //run ¸Þ¼Òµå
-			}; //runnable Á¤ÀÇ ³¡
-
-			executorService.submit(runnable); //2
-		} //send(String data)¸Þ¼Òµå ³¡
-
-	} // ³»ºÎ Client class
-
-	void startServer() {
-		executorService = Executors.newFixedThreadPool(10);
-		/*¾²·¹µå »ç¿ë
-
-		1. ¼­¹ö·Î µé¾î¿À´Â ¸Þ¼¼Áö ¹ÞÀ» ¶§ 1°³
-		
-		2. ¼­¹ö·Î µé¾î¿À´Â ´Ù¸¥ »ç¿ëÀÚ ¸Þ¼¼Áö ¹ÞÀ» ¶§ 1°³ 1°³
-
-		2. ¼­¹ö·Î µé¾î¿Â ¸Þ¼¼Áö¸¦ Å¬¶óÀÌ¾ðÆ®µé¿¡°Ô º¸³¾ ¶§ 1°³ send(String data)
-
-		3. ¼­¹ö°¡ accept() ÇÒ ¶§ 1°³
-		
-		* 3ÀÎ ÀÌ»ó Ã¤ÆÃÇÏ·Á¸é Àû¾îµµ 5°³ ÀÌ»óÀÇ ¾²·¹µå°¡ ÇÊ¿äÇÏ´Ù.
-		*/
-
-		try {
-			serverSocket = new ServerSocket();
-			InetSocketAddress isa = new InetSocketAddress(hostIp, portNumber);
-			serverSocket.bind(isa);
-			Runnable runnable = new Runnable() {
-
-				@Override
-				public void run() {
-					Platform.runLater(() -> {
-						displayText("[¼­¹ö½ÃÀÛ]");
-					});
-
-					while (true) {
-						try {
-							Socket socket = serverSocket.accept();
-							String message = "¿¬°á ¼ö¶ô " + socket.getRemoteSocketAddress();
-							
-							Platform.runLater(() -> {
-								displayText(message);
-							});
-
-							Client client = new Client(socket);
-							connections.add(client);
-
-							Platform.runLater(() -> {
-								displayText("¿¬°á °³¼ö" + connections.size());
-							});
-
-						} catch (Exception e) {
-							if (!serverSocket.isClosed()) {
-								stopServer();
-								break;
-							}
-
-						}
-					}
-
-				}
-			};
-
-			executorService.submit(runnable); //3
-
-		} catch (Exception e) {
-			if (!serverSocket.isClosed()) {
-				stopServer();
-				return;
-			}
-		}
-
-	}//startServer() ¸Þ¼Òµå
-
-	void stopServer() {
-		try {
-			Iterator<Client> iterator = connections.iterator();
-			while (iterator.hasNext()) {
-				Client client = iterator.next();
-				client.socket.close();
-				iterator.remove();
-
-			}
-
-			if (serverSocket != null && !serverSocket.isClosed()) {
-				serverSocket.close();
-			}
-
-			if (executorService != null && !executorService.isShutdown()) {
-				executorService.shutdown();
-			}
-
-			Platform.runLater(() -> {
-				displayText("¼­¹ö ¸ØÃã");
-				btnStartStop.setText("start");
-
-			});
-
-		} catch (Exception e) {
-			e.printStackTrace();
-
-		}
-
-	}//stopServer()¸Þ¼Òµå Á¾·á
-
-	TextArea txtDisplay;
-	Button btnStartStop;
-
-	@Override
-	public void start(Stage primaryStage) throws Exception {
-		BorderPane root = new BorderPane();
-		root.setPrefSize(500, 300);
-
-		txtDisplay = new TextArea();
-		txtDisplay.setEditable(false);
-		BorderPane.setMargin(txtDisplay, new Insets(0, 0, 2, 0));
-		root.setCenter(txtDisplay);
-
-		btnStartStop = new Button("start");
-		btnStartStop.setPrefHeight(30);
-		btnStartStop.setMaxWidth(Double.MAX_VALUE);
-
-		btnStartStop.setOnAction(e -> {
-			if (btnStartStop.getText().equals("start")) {
-				startServer();
-			} else {
-				stopServer();
-			}
-		});
-
-		root.setBottom(btnStartStop);
-
-		Scene scene = new Scene(root);
-		scene.getStylesheets().add(getClass().getResource("app.css").toString());
-		primaryStage.setScene(scene);
-		primaryStage.setTitle("Server");
-		
-		primaryStage.setOnCloseRequest(e -> {
-			stopServer();
-			
-		});
-		primaryStage.show();
-
-	}
-
-	void displayText(String text) {
-		txtDisplay.appendText(text + "\n");
-	} //displayText(String text) ¸Þ¼Òµå Á¾·á
-
-	public static void main(String[] args) {
-		launch(args);
-
-	}
+//public class ServerExample extends Application {
+	public class ServerExample{
+//	
+//	ExecutorService executorService;
+//	ServerSocket serverSocket;
+//	Vector<Client> connections = new Vector<>();
+//	int portNumber =5001;
+//	String hostIp = "192.168.20.26";
+//
+//	
+//	public class Client { //ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½
+//		
+//		Socket socket;
+//
+//		
+//		public Client(Socket socket) {
+//			this.socket = socket;
+//			receive();
+//		}
+//
+//		
+//		void receive() {
+//			
+//			Runnable runnable = new Runnable() {
+//
+//				@Override
+//				public void run() {
+//					try {
+//						while (true) {
+//							
+//							byte[] byteArr = new byte[100];
+//							InputStream inputStream = socket.getInputStream();
+//							int readByteCount = inputStream.read(byteArr);//Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½é¿¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½ È®ï¿½ï¿½
+//							
+//							if (readByteCount == -1) {
+//								throw new IOException();
+//							}
+//							
+//							String message = "ï¿½ï¿½Ã» Ã³ï¿½ï¿½" + socket.getRemoteSocketAddress() +Thread.currentThread().getName();
+//							Platform.runLater(() -> {
+//								displayText(message);
+//							});
+//
+//							String data = new String(byteArr, 0, readByteCount, "UTF-8");
+//
+//							for (Client client : connections) { //Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½é¿¡ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+//								client.send(data);
+//							}
+//
+//						} // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+//
+//					} catch (IOException e) {
+//
+//						try {
+//							connections.remove(Client.this);
+//							String message = "Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ ï¿½Èµï¿½" + socket.getRemoteSocketAddress();
+//							Platform.runLater(() -> {
+//								displayText(message);
+//							});
+//
+//							socket.close();
+//
+//						} catch (Exception e2) {
+//							// TODO: handle exception
+//						}
+//
+//					}
+//
+//				}
+//			};
+//
+//			executorService.submit(runnable);  // 1
+//		}
+//
+//		void send(String data) {
+//			Runnable runnable = new Runnable() {
+//
+//				@Override
+//				public void run() {
+//					try {
+//
+//						byte[] byteArr = data.getBytes("UTF-8");
+//						OutputStream outputStream = socket.getOutputStream();
+//						outputStream.write(byteArr); 
+//						outputStream.flush();
+//
+//					} catch (Exception e) {
+//						try {
+//							String message = "Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ ï¿½Èµï¿½ :" + socket.getRemoteSocketAddress();
+//							Platform.runLater(() -> {
+//								displayText(message);
+//							});
+//
+//							connections.remove(Client.this);
+//							socket.close();
+//
+//						} catch (Exception e2) {
+//							// TODO: handle exception
+//						}
+//
+//					}
+//				} //run ï¿½Þ¼Òµï¿½
+//			}; //runnable ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+//
+//			executorService.submit(runnable); //2
+//		} //send(String data)ï¿½Þ¼Òµï¿½ ï¿½ï¿½
+//
+//	} // ï¿½ï¿½ï¿½ï¿½ Client class
+//
+//	void startServer() {
+//		executorService = Executors.newFixedThreadPool(10);
+//		/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+//
+//		1. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ 1ï¿½ï¿½
+//		
+//		2. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ 1ï¿½ï¿½ 1ï¿½ï¿½
+//
+//		2. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½é¿¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ 1ï¿½ï¿½ send(String data)
+//
+//		3. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ accept() ï¿½ï¿½ ï¿½ï¿½ 1ï¿½ï¿½
+//		
+//		* 3ï¿½ï¿½ ï¿½Ì»ï¿½ Ã¤ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½îµµ 5ï¿½ï¿½ ï¿½Ì»ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½å°¡ ï¿½Ê¿ï¿½ï¿½Ï´ï¿½.
+//		*/
+//
+//		try {
+//			serverSocket = new ServerSocket();
+//			InetSocketAddress isa = new InetSocketAddress(hostIp, portNumber);
+//			serverSocket.bind(isa);
+//			Runnable runnable = new Runnable() {
+//
+//				@Override
+//				public void run() {
+//					Platform.runLater(() -> {
+//						displayText("[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]");
+//					});
+//
+//					while (true) {
+//						try {
+//							Socket socket = serverSocket.accept();
+//							String message = "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ " + socket.getRemoteSocketAddress();
+//							
+//							Platform.runLater(() -> {
+//								displayText(message);
+//							});
+//
+//							Client client = new Client(socket);
+//							connections.add(client);
+//
+//							Platform.runLater(() -> {
+//								displayText("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½" + connections.size());
+//							});
+//
+//						} catch (Exception e) {
+//							if (!serverSocket.isClosed()) {
+//								stopServer();
+//								break;
+//							}
+//
+//						}
+//					}
+//
+//				}
+//			};
+//
+//			executorService.submit(runnable); //3
+//
+//		} catch (Exception e) {
+//			if (!serverSocket.isClosed()) {
+//				stopServer();
+//				return;
+//			}
+//		}
+//
+//	}//startServer() ï¿½Þ¼Òµï¿½
+//
+//	void stopServer() {
+//		try {
+//			Iterator<Client> iterator = connections.iterator();
+//			while (iterator.hasNext()) {
+//				Client client = iterator.next();
+//				client.socket.close();
+//				iterator.remove();
+//
+//			}
+//
+//			if (serverSocket != null && !serverSocket.isClosed()) {
+//				serverSocket.close();
+//			}
+//
+//			if (executorService != null && !executorService.isShutdown()) {
+//				executorService.shutdown();
+//			}
+//
+//			Platform.runLater(() -> {
+//				displayText("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½");
+//				btnStartStop.setText("start");
+//
+//			});
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//
+//		}
+//
+//	}//stopServer()ï¿½Þ¼Òµï¿½ ï¿½ï¿½ï¿½ï¿½
+//
+//	TextArea txtDisplay;
+//	Button btnStartStop;
+//
+//	@Override
+//	public void start(Stage primaryStage) throws Exception {
+//		BorderPane root = new BorderPane();
+//		root.setPrefSize(500, 300);
+//
+//		txtDisplay = new TextArea();
+//		txtDisplay.setEditable(false);
+//		BorderPane.setMargin(txtDisplay, new Insets(0, 0, 2, 0));
+//		root.setCenter(txtDisplay);
+//
+//		btnStartStop = new Button("start");
+//		btnStartStop.setPrefHeight(30);
+//		btnStartStop.setMaxWidth(Double.MAX_VALUE);
+//
+//		btnStartStop.setOnAction(e -> {
+//			if (btnStartStop.getText().equals("start")) {
+//				startServer();
+//			} else {
+//				stopServer();
+//			}
+//		});
+//
+//		root.setBottom(btnStartStop);
+//
+//		Scene scene = new Scene(root);
+//		scene.getStylesheets().add(getClass().getResource("app.css").toString());
+//		primaryStage.setScene(scene);
+//		primaryStage.setTitle("Server");
+//		
+//		primaryStage.setOnCloseRequest(e -> {
+//			stopServer();
+//			
+//		});
+//		primaryStage.show();
+//
+//	}
+//
+//	void displayText(String text) {
+//		txtDisplay.appendText(text + "\n");
+//	} //displayText(String text) ï¿½Þ¼Òµï¿½ ï¿½ï¿½ï¿½ï¿½
+//
+//	public static void main(String[] args) {
+//		launch(args);
+//
+//	}
 
 }
