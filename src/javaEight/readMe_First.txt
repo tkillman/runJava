@@ -76,6 +76,7 @@ ex08 function
 ex09 optional, groupby
 ex10 collect
 ex11 reduce
+ex12 flatmap
 ====================================================
 package practice
 	
