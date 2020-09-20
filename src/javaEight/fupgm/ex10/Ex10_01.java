@@ -3,12 +3,14 @@ package javaEight.fupgm.ex10;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.maxBy;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,6 +21,25 @@ public class Ex10_01 {
 		// collect(Supplier supplier, BiConsumer accumulator, BiConsumer combiner)
 		
 		Stream<String> fruits = Stream.of("monkeyBanana", "apple", "mango", "kiwi", "peach", "cherry", "lemon");
+		
+		fruits.collect(new Supplier<ArrayList<String>>() {
+			@Override
+			public ArrayList<String> get() {
+				
+				return new ArrayList<>();
+			}
+		}, new BiConsumer<ArrayList<String>, String>() {
+			public void accept(ArrayList<String> t, String u) {
+				t.add(u);
+			};
+		}, new BiConsumer<ArrayList<String>, ArrayList<String>>() {
+			public void accept(ArrayList<String> t, ArrayList<String> u) {
+				t.addAll(u);
+			};
+		});
+		
+		fruits.collect(() -> new ArrayList<>(),(a, s) -> a.add(s), (a, b) -> a.addAll(b));
+		fruits.collect(Collectors.toList());
 		
 //		HashSet<String> fruitHashSet = fruits.collect(HashSet::new, HashSet::add, HashSet::addAll);
 		

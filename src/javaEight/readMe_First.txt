@@ -75,8 +75,10 @@ ex07 filter
 ex08 function
 ex09 optional, groupby
 ex10 collect
-ex11 reduce
+ex11 reduce, summarizingDouble
 ex12 flatmap
+ex13 Collectors.mapping
+ex14 peek ( debug)
 ====================================================
 package practice
 	

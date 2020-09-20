@@ -20,4 +20,9 @@ public class TTController {
 		hah.addAll(kList);
 		System.out.println(hah);
 	}
+	
+	public static <T> T ttTClassReturn(T value) {
+		
+		return value;
+	}
 }
