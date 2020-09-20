@@ -23,10 +23,7 @@ import java.util.stream.Stream;
 import static java.util.Comparator.comparing;
 
 public class Ex11_01 {
-	
-	
-	
-	
+
 	public static void main(String[] args) {
 //		Integer reducedParams = Stream.of(1, 2, 3)
 //				  .reduce(10, // identity
@@ -136,5 +133,36 @@ public class Ex11_01 {
 		 for (Entry e : result.entrySet()) {
 			 System.out.println(e.getValue());
 		 }
+		 
+		 //기준점수가 있고 그냥 점수가 있을 때 기준점수보다 낮은거
+		 // score1 통과
+		 // score2 map1만 통과
+		 // score3 map2만 통과
+		 
+		 System.out.println("기준점수랑 비교");
+		 Map<String, Object> stand = MockData11.makeStandMock(); //기준점수
+		 List<Map<String, Object>> list3 = MockData11.makeMock();
+		
+		 list3.stream().forEach(map -> {
+			 map.entrySet()
+			 	.stream()
+			 	.filter(entry -> entry.getKey().startsWith("score"))
+			 	.filter(entry -> (Integer)stand.get(entry.getKey()) > (Integer)entry.getValue())
+			 	.forEach(entry -> {
+			 		entry.setValue(null);
+			 	});
+		 });
+		 
+		 for (Map<String, Object> map : list3) {
+			 for (Entry<String, Object> entry :map.entrySet()) {
+				 if (entry.getKey().startsWith("score")) {
+					 if ((Integer)stand.get(entry.getKey()) > (Integer)entry.getValue()) {
+						 entry.setValue(null);
+					 }
+				 }
+			 }
+		 }
+		 
+		 System.out.println(list3);
 	}
 }
